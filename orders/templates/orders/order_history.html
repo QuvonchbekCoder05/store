@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Buyurtma Tarixi{% endblock %}
+
+{% block content %}
+    <h1 class="text-center">Buyurtma Tarixi</h1>
+    <div class="order-container">
+        {% if orders %}
+            {% for order in orders %}
+                <div class="order-card">
+                    <h3>Buyurtma ID: {{ order.id }}</h3>
+                    <p>Buyurtma sanasi: {{ order.created_at }}</p>
+                    <p>Jami narx: {{ order.get_total_cost }} so'm</p>
+                    <ul>
+                        {% for item in order.items.all %}
+                            <li>{{ item.product.title }} - {{ item.selected_color }} rang, {{ item.quantity }} dona</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>Sizda buyurtma tarixi mavjud emas.</p>
+        {% endif %}
+    </div>
+{% endblock %}

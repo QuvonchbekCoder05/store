@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}Mahsulotlar Ro'yxati{% endblock %}
+
+{% block content %}
+    <style>
+        .product-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .product-card {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 48%;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+
+        .product-details {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+
+        .product-details h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .product-details img {
+            width: 150px;
+            height: auto;
+            margin-bottom: 1rem;
+        }
+
+        .product-details p {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-details form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .product-details select,
+        .product-details input[type="number"] {
+            margin-bottom: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            background-color: #007BFF;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 0.5rem;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+
+    <h1 class="text-center">Mahsulotlar Ro'yxati</h1>
+    <div class="product-container">
+        {% for product in products %}
+            <div class="product-card" data-product-id="{{ product.pk }}">
+                <div class="product-details">
+                    <h2>{{ product.title }}</h2>
+                    <img src="{{ product.image.url }}" alt="{{ product.title }}">
+                    <p class="product-price">{{ product.base_price }} so'm</p>
+                    <form method="post" action="{% url 'add_to_cart' product.pk %}">
+                        {% csrf_token %}
+                        <label for="color_{{ product.pk }}">Rangni tanlang:</label>
+                        <select id="color_{{ product.pk }}" name="color" class="color-select" data-product-id="{{ product.pk }}">
+                            <option value="oq">Oq</option>
+                            <option value="qora">Qora</option>
+                            <option value="qizil">Qizil</option>
+                        </select>
+                        <input type="number" name="quantity" value="1" min="1" max="10">
+                        <a href="{% url 'product_detail' product.pk %}" class="btn">To'liq Tavsifi</a>
+                        <button type="submit" class="btn">Savatchaga qo'shish</button>
+                    </form>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const colorSelects = document.querySelectorAll('.color-select');
+            colorSelects.forEach(select => {
+                select.addEventListener('change', function () {
+                    const productId = this.dataset.productId;
+                    const selectedColor = this.value;
+                    const priceElement = document.querySelector(`.product-card[data-product-id="${productId}"] .product-price`);
+                    let basePrice = {{ product.base_price }};
+                    let additionalPrice = 0;
+
+                    if (selectedColor === 'oq') {
+                        additionalPrice = {{ product.color_white_price }};
+                    } else if (selectedColor === 'qora') {
+                        additionalPrice = {{ product.color_black_price }};
+                    } else if (selectedColor === 'qizil') {
+                        additionalPrice = {{ product.color_red_price }};
+                    }
+
+                    priceElement.textContent = basePrice + additionalPrice + ' so\'m';
+                });
+            });
+        });
+    </script>
+{% endblock %}

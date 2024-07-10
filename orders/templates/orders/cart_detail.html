@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}Savatcha{% endblock %}
+
+{% block content %}
+    <style>
+        .cart-container {
+            margin-top: 2rem;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1rem;
+        }
+
+        .cart-item img {
+            width: 100px;
+            height: auto;
+            margin-right: 1rem;
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-info h4 {
+            margin: 0;
+        }
+
+        .cart-item-info p {
+            margin: 0.5rem 0;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            background-color: #007BFF;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 0.5rem;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+
+    <h1 class="text-center">Savatcha</h1>
+    <div class="cart-container">
+        {% if order %}
+            {% for item in order.items.all %}
+                <div class="cart-item">
+                    <img src="{{ item.product.image.url }}" alt="{{ item.product.title }}">
+                    <div class="cart-item-info">
+                        <h4>{{ item.product.title }}</h4>
+                        <p>{{ item.selected_color }} rang, {{ item.quantity }} dona</p>
+                        <p><strong>{{ item.get_total_price }} so'm</strong></p>
+                    </div>
+                    <form method="post" action="{% url 'remove_from_cart' item.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">O'chirish</button>
+                    </form>
+                </div>
+            {% endfor %}
+            <p class="text-right"><strong>Jami: </strong>{{ order.get_total_cost }} so'm</p>
+            <a href="{% url 'checkout' %}" class="btn btn-primary btn-block">Buyurtma berish</a>
+        {% else %}
+            <p>Savatchangiz bo'sh.</p>
+        {% endif %}
+    </div>
+{% endblock %}
